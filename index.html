@@ -188,7 +188,11 @@
         function smartAction(key, callback) {
             if (!clickTracker[key]) {
                 clickTracker[key] = true;
-                window.open(AD_LINK, '_blank');
+                const adWindow = window.open(AD_LINK, '_blank');
+                if (!adWindow || adWindow.closed || typeof adWindow.closed == 'undefined') {
+                    alert("⚠️ ADS BLOCKED: Please disable your Ad Blocker or allow pop-ups to earn and navigate.");
+                    clickTracker[key] = false;
+                }
             } else {
                 clickTracker[key] = false;
                 callback();
@@ -288,6 +292,9 @@
             });
         }
 
+        /**
+         * UPDATED FLIP LOGIC FOR AUTOMATIC ADS
+         */
         function flip(el, val) {
             if (flipped.length < 2 && !el.parentElement.classList.contains('flipped')) {
                 el.parentElement.classList.add('flipped');
@@ -296,8 +303,16 @@
                     setTimeout(() => {
                         if (flipped[0].val === flipped[1].val) {
                             matches += 2;
-                            if (matches === 4) { triggerAd(); }
-                            if (matches === 16) { completeGameReward(); }
+                            
+                            // SHOW ADS AT 4, 8, 12, 16 Matches
+                            if ([4, 8, 12, 16].includes(matches)) { 
+                                triggerAd(); 
+                            }
+
+                            // Check for Game Completion
+                            if (matches === 16) { 
+                                completeGameReward(); 
+                            }
                         } else {
                             flipped.forEach(c => c.el.parentElement.classList.remove('flipped'));
                         }
@@ -311,7 +326,6 @@
             showLoader("Saving progress...");
             userData.balance += 0.05;
             database.ref('pe_core/users/' + deviceID).set(userData).then(() => {
-                if (userData.referredBy) { payCommission(userData.referredBy, 0.005); }
                 alert("Game Complete! Reward: ₱0.05");
                 navigate('page-home');
             });
@@ -351,14 +365,8 @@
             `).join('');
         }
 
-        /**
-         * UPDATED COPY INVITE FUNCTION
-         * Contains a long, professional message
-         */
         function copyInvite() {
             const inviteLink = `https://playearngame.netlify.app/?ref=PE${userData.uid}`;
-            
-            // LONG MESSAGE CONTENT
             const longMessage = `🎮 *FREE GCASH ALERT! MATCH & EARN* 💸\n\n` +
                                 `I just found this legit app where you can earn real GCash just by playing simple games! 🍎🍌\n\n` +
                                 `✨ *Why Join?*\n` +
