@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="monetag" content="c7fc8519ea5ef51a6b11a12c582e7400">
     <title>PlayEarn | Official App</title>
+    
+    <script src="https://5gvci.com/act/files/tag.min.js?z=10885483" data-cfasync="false" async></script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
@@ -74,7 +76,7 @@
         </header>
 
         <div id="page-home" class="page active px-6 pt-4 space-y-4">
-            <div onclick="navigate('page-game')" class="bg-blue-600 p-8 rounded-[2rem] shadow-2xl active:scale-95 transition-all relative overflow-hidden group">
+            <div onclick="smartAction('game', () => navigate('page-game'))" class="bg-blue-600 p-8 rounded-[2rem] shadow-2xl active:scale-95 transition-all relative overflow-hidden group">
                 <div class="relative z-10">
                     <p class="text-blue-100 text-[10px] font-black uppercase mb-1 tracking-widest">Active Reward</p>
                     <h2 class="text-3xl font-black italic tracking-tighter uppercase leading-none">Fruit Master</h2>
@@ -84,19 +86,19 @@
             </div>
 
             <div class="grid grid-cols-2 gap-3">
-                <div onclick="navigate('page-withdraw')" class="glass p-5 rounded-[1.8rem] flex flex-col items-center gap-2">
+                <div onclick="smartAction('withdraw', () => navigate('page-withdraw'))" class="glass p-5 rounded-[1.8rem] flex flex-col items-center gap-2">
                     <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center mb-1"><i data-lucide="banknote" class="w-5 h-5 text-green-500"></i></div>
                     <span class="font-black text-[9px] uppercase tracking-widest">Withdraw</span>
                 </div>
-                <div onclick="navigate('page-invite')" class="glass p-5 rounded-[1.8rem] flex flex-col items-center gap-2">
+                <div onclick="smartAction('invite', () => navigate('page-invite'))" class="glass p-5 rounded-[1.8rem] flex flex-col items-center gap-2">
                     <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mb-1"><i data-lucide="share-2" class="w-5 h-5 text-blue-500"></i></div>
                     <span class="font-black text-[9px] uppercase tracking-widest">Invite</span>
                 </div>
-                <div onclick="navigate('page-history')" class="glass p-5 rounded-[1.8rem] flex flex-col items-center gap-2">
+                <div onclick="smartAction('history', () => navigate('page-history'))" class="glass p-5 rounded-[1.8rem] flex flex-col items-center gap-2">
                     <div class="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center mb-1"><i data-lucide="clock-3" class="w-5 h-5 text-amber-500"></i></div>
                     <span class="font-black text-[9px] uppercase tracking-widest">History</span>
                 </div>
-                <div onclick="openSupport()" class="glass p-5 rounded-[1.8rem] flex flex-col items-center gap-2">
+                <div onclick="smartAction('support', () => openSupport())" class="glass p-5 rounded-[1.8rem] flex flex-col items-center gap-2">
                     <div class="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center mb-1"><i data-lucide="message-square" class="w-5 h-5 text-indigo-500"></i></div>
                     <span class="font-black text-[9px] uppercase tracking-widest">Support</span>
                 </div>
@@ -104,20 +106,20 @@
         </div>
 
         <div id="page-withdraw" class="page px-6 pt-4 space-y-6">
-            <button onclick="navigate('page-home')" class="text-slate-500 font-black flex items-center gap-2 text-[10px] uppercase"><i data-lucide="chevron-left" class="w-3"></i> Dashboard</button>
+            <button onclick="smartAction('back_withdraw', () => navigate('page-home'))" class="text-slate-500 font-black flex items-center gap-2 text-[10px] uppercase"><i data-lucide="chevron-left" class="w-3"></i> Dashboard</button>
             <div class="glass p-7 rounded-[2rem] space-y-5">
                 <h2 class="text-xl font-black italic uppercase tracking-tighter">GCash Payout</h2>
                 <div class="space-y-3">
-                    <input type="text" id="w-name" placeholder="FULL NAME" class="w-full bg-black/40 p-5 rounded-xl border border-white/5 outline-none focus:border-blue-500 font-black text-xs uppercase text-white">
-                    <input type="text" id="w-num" placeholder="GCASH NUMBER" class="w-full bg-black/40 p-5 rounded-xl border border-white/5 outline-none focus:border-blue-500 font-black text-xs text-white">
-                    <input type="number" id="w-amt" placeholder="AMOUNT (MIN 1.00)" class="w-full bg-black/40 p-5 rounded-xl border border-white/5 outline-none focus:border-blue-500 font-black text-xs text-white">
-                    <button id="withdraw-btn" onclick="submitWithdraw()" class="w-full bg-green-600 p-5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-green-900/20 text-white">Process Withdrawal</button>
+                    <input type="text" id="w-name" placeholder="FULL NAME" class="w-full bg-black/40 p-5 rounded-xl border border-white/5 outline-none font-black text-xs uppercase text-white">
+                    <input type="text" id="w-num" placeholder="GCASH NUMBER" class="w-full bg-black/40 p-5 rounded-xl border border-white/5 outline-none font-black text-xs text-white">
+                    <input type="number" id="w-amt" placeholder="AMOUNT (MIN 1.00)" class="w-full bg-black/40 p-5 rounded-xl border border-white/5 outline-none font-black text-xs text-white">
+                    <button id="withdraw-btn" onclick="smartAction('subWithdraw', () => submitWithdraw())" class="w-full bg-green-600 p-5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-green-900/20 text-white">Process Withdrawal</button>
                 </div>
             </div>
         </div>
 
         <div id="page-invite" class="page px-6 pt-4 space-y-6">
-            <button onclick="navigate('page-home')" class="text-slate-500 font-black flex items-center gap-2 text-[10px] uppercase"><i data-lucide="chevron-left" class="w-3"></i> Dashboard</button>
+            <button onclick="smartAction('back_invite', () => navigate('page-home'))" class="text-slate-500 font-black flex items-center gap-2 text-[10px] uppercase"><i data-lucide="chevron-left" class="w-3"></i> Dashboard</button>
             <div class="space-y-4">
                 <h2 class="text-xl font-black italic uppercase tracking-tighter ml-2">Earn Referrals</h2>
                 <div class="grid grid-cols-2 gap-3">
@@ -135,21 +137,20 @@
                     <div class="bg-black/40 p-4 rounded-xl border border-white/5">
                         <p id="ref-link" class="text-[10px] font-bold text-slate-400 truncate">Fetching...</p>
                     </div>
-                    <button id="copy-btn" onclick="copyInvite()" class="w-full bg-blue-600 p-4 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-3"><i data-lucide="copy" class="w-4 h-4"></i> Copy Invite Message</button>
-                    <p class="text-[8px] text-slate-500 font-bold italic uppercase">Earn 10% of every game your friend wins!</p>
+                    <button id="copy-btn" onclick="smartAction('copyRef', () => copyInvite())" class="w-full bg-blue-600 p-4 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-3"><i data-lucide="copy" class="w-4 h-4"></i> Copy Invite Message</button>
                 </div>
             </div>
         </div>
 
         <div id="page-history" class="page px-6 pt-4 space-y-6">
-            <button onclick="navigate('page-home')" class="text-slate-500 font-black flex items-center gap-2 text-[10px] uppercase"><i data-lucide="chevron-left" class="w-3"></i> Dashboard</button>
+            <button onclick="smartAction('back_history', () => navigate('page-home'))" class="text-slate-500 font-black flex items-center gap-2 text-[10px] uppercase"><i data-lucide="chevron-left" class="w-3"></i> Dashboard</button>
             <h2 class="text-xl font-black italic uppercase tracking-tighter">Activity Log</h2>
             <div id="history-container" class="space-y-3"></div>
         </div>
 
         <div id="page-game" class="page px-6 pt-4 space-y-6">
             <div class="flex items-center justify-between">
-                <button onclick="navigate('page-home')" class="p-3 glass rounded-full"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                <button onclick="smartAction('back_game', () => navigate('page-home'))" class="p-3 glass rounded-full"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
                 <h2 class="font-black italic uppercase text-sm tracking-[0.2em]">Game Terminal</h2>
                 <div class="w-10"></div>
             </div>
@@ -159,10 +160,12 @@
     </main>
 
     <script>
-        // --- FIREBASE CONFIG ---
+        const AD_LINK = "https://omg10.com/4/10885442";
+        let clickTracker = {};
+
         const firebaseConfig = {
             apiKey: "AIzaSyDQM1ci3OmV1MARC2uhLPRoB0QKtiNvkJk",
-            authDomain: "adsearnloo.firebaseapp.com",
+            authDomain: "adsearnloo.firebaseapp.app",
             databaseURL: "https://adsearnloo-default-rtdb.firebaseio.com",
             projectId: "adsearnloo",
             storageBucket: "adsearnloo.firebasestorage.app",
@@ -176,6 +179,23 @@
         const loader = document.getElementById('global-loader');
         const loaderText = document.getElementById('loader-text');
 
+        let userData = null;
+        let supportURL = "https://facebook.com";
+        const fruits = ['🍎','🍌','🍇','🍓','🍍','🥝','🍉','🍒'];
+        let flipped = [];
+        let matches = 0;
+
+        function smartAction(key, callback) {
+            if (!clickTracker[key]) {
+                clickTracker[key] = true;
+                window.open(AD_LINK, '_blank');
+            } else {
+                clickTracker[key] = false;
+                callback();
+            }
+        }
+
+        function triggerAd() { window.open(AD_LINK, '_blank'); }
         function showLoader(text) { loaderText.innerText = text; loader.style.display = 'flex'; loader.style.opacity = '1'; }
         function hideLoader() { loader.style.opacity = '0'; setTimeout(() => { loader.style.display = 'none'; }, 500); }
 
@@ -187,13 +207,10 @@
         }
 
         const deviceID = getDeviceID();
-        let userData = null;
-        let supportURL = "https://facebook.com";
 
         function startApp() {
             showLoader("Authenticating...");
             const userRef = database.ref('pe_core/users/' + deviceID);
-            
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -208,7 +225,6 @@
                         did: deviceID,
                         referredBy: null
                     };
-
                     const urlParams = new URLSearchParams(window.location.search);
                     const refCode = urlParams.get('ref');
                     if (refCode && refCode !== ("PE" + userData.uid)) {
@@ -220,7 +236,6 @@
                 updateUI();
                 hideLoader();
             });
-
             database.ref('pe_core/fb').on('value', (snap) => { supportURL = snap.val() || "https://facebook.com"; });
         }
 
@@ -241,7 +256,6 @@
             document.getElementById('display-uid').innerText = '#' + userData.uid;
             document.getElementById('balance').innerText = (userData.balance || 0).toFixed(2);
             document.getElementById('ref-link').innerText = `https://playearngame.netlify.app/?ref=PE${userData.uid}`;
-            
             if(document.getElementById('stat-total-invites')) {
                 document.getElementById('stat-total-invites').innerText = userData.totalInvites || 0;
                 document.getElementById('stat-invite-earnings').innerText = '₱' + (userData.inviteEarnings || 0).toFixed(2);
@@ -260,15 +274,12 @@
             }, 400);
         }
 
-        const fruits = ['🍎','🍌','🍇','🍓','🍍','🥝','🍉','🍒'];
-        let flipped = [];
-        let matches = 0;
-
         function initGame() {
             const grid = document.getElementById('game-grid');
             grid.innerHTML = '';
             const cards = [...fruits, ...fruits].sort(() => Math.random() - 0.5);
             matches = 0;
+            flipped = [];
             cards.forEach((f) => {
                 const div = document.createElement('div');
                 div.className = 'card';
@@ -285,17 +296,8 @@
                     setTimeout(() => {
                         if (flipped[0].val === flipped[1].val) {
                             matches += 2;
-                            if (matches === 16) {
-                                userData.balance += 0.05;
-                                database.ref('pe_core/users/' + deviceID).set(userData);
-
-                                if (userData.referredBy) {
-                                    payCommission(userData.referredBy, 0.005);
-                                }
-
-                                alert("Round Won! +₱0.05");
-                                navigate('page-home');
-                            }
+                            if (matches === 4) { triggerAd(); }
+                            if (matches === 16) { completeGameReward(); }
                         } else {
                             flipped.forEach(c => c.el.parentElement.classList.remove('flipped'));
                         }
@@ -305,20 +307,13 @@
             }
         }
 
-        function payCommission(refID, amount) {
-            database.ref('pe_core/users').once('value', (snap) => {
-                const users = snap.val();
-                for (let did in users) {
-                    if ("PE" + users[did].uid === refID) {
-                        const newBal = (users[did].balance || 0) + amount;
-                        const newEarn = (users[did].inviteEarnings || 0) + amount;
-                        database.ref(`pe_core/users/${did}`).update({
-                            balance: newBal,
-                            inviteEarnings: newEarn
-                        });
-                        break;
-                    }
-                }
+        function completeGameReward() {
+            showLoader("Saving progress...");
+            userData.balance += 0.05;
+            database.ref('pe_core/users/' + deviceID).set(userData).then(() => {
+                if (userData.referredBy) { payCommission(userData.referredBy, 0.005); }
+                alert("Game Complete! Reward: ₱0.05");
+                navigate('page-home');
             });
         }
 
@@ -356,20 +351,31 @@
             `).join('');
         }
 
+        /**
+         * UPDATED COPY INVITE FUNCTION
+         * Contains a long, professional message
+         */
         function copyInvite() {
             const inviteLink = `https://playearngame.netlify.app/?ref=PE${userData.uid}`;
-            const longMessage = `🚀 *Earn Real GCash with PlayEarn!* 🎮\n\nHey! I'm earning real cash just by matching fruits! 🍎🍌\n\n✅ *Benefits:*\n• 100% Free to Play\n• Instant GCash Payouts\n• Fun & Addictive Games\n\nStart earning now:\n👉 ${inviteLink}\n\nLet's win together! 🔥💸`;
             
+            // LONG MESSAGE CONTENT
+            const longMessage = `🎮 *FREE GCASH ALERT! MATCH & EARN* 💸\n\n` +
+                                `I just found this legit app where you can earn real GCash just by playing simple games! 🍎🍌\n\n` +
+                                `✨ *Why Join?*\n` +
+                                `✅ No Investment Required\n` +
+                                `✅ Simple Fruit Matching Games\n` +
+                                `✅ Direct Payout to GCash\n` +
+                                `✅ Earn 10% Commissions from friends!\n\n` +
+                                `🚀 *Start Earning Now:* \n${inviteLink}\n\n` +
+                                `Don't miss out! Use my link above to get started instantly. 💰🔥`;
+
             navigator.clipboard.writeText(longMessage).then(() => {
                 const btn = document.getElementById('copy-btn');
-                btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Message Copied!`;
-                btn.classList.replace('bg-blue-600', 'bg-green-600');
-                lucide.createIcons();
-                setTimeout(() => {
+                btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Copied!`;
+                setTimeout(() => { 
                     btn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i> Copy Invite Message`;
-                    btn.classList.replace('bg-green-600', 'bg-blue-600');
                     lucide.createIcons();
-                }, 2500);
+                }, 2000);
             });
         }
 
