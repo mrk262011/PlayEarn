@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="monetag" content="c7fc8519ea5ef51a6b11a12c582e7400">
     <title>PlayEarn | Official App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -14,7 +15,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: white; overflow: hidden; }
         
-        /* ENHANCED LOADING SYSTEM */
         #global-loader { 
             position: fixed; inset: 0; z-index: 1000; background: #020617; 
             display: flex; align-items: center; justify-content: center; flex-direction: column; 
@@ -27,14 +27,12 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Page Animations */
         .page { display: none; height: 100vh; overflow-y: auto; padding-bottom: 100px; }
         .page.active { display: block; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         
-        /* Memory Game Cards */
         .card { perspective: 1000px; height: 85px; }
         .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.5s; transform-style: preserve-3d; cursor: pointer; }
         .card.flipped .card-inner { transform: rotateY(180deg); }
@@ -52,7 +50,7 @@
             <div class="spinner mb-6"></div>
             <div class="text-center">
                 <h2 class="text-[11px] font-black tracking-[0.5em] text-blue-500 uppercase">Secure Link</h2>
-                <p id="loader-text" class="text-[9px] font-bold text-slate-500 uppercase mt-2">Initializing Terminal...</p>
+                <p id="loader-text" class="text-[9px] font-bold text-slate-500 uppercase mt-2">Initializing...</p>
             </div>
         </div>
     </div>
@@ -110,10 +108,10 @@
             <div class="glass p-7 rounded-[2rem] space-y-5">
                 <h2 class="text-xl font-black italic uppercase tracking-tighter">GCash Payout</h2>
                 <div class="space-y-3">
-                    <input type="text" id="w-name" placeholder="FULL NAME" class="w-full bg-black/40 p-5 rounded-xl border border-white/5 outline-none focus:border-blue-500 font-black text-xs uppercase">
-                    <input type="text" id="w-num" placeholder="GCASH NUMBER" class="w-full bg-black/40 p-5 rounded-xl border border-white/5 outline-none focus:border-blue-500 font-black text-xs">
-                    <input type="number" id="w-amt" placeholder="AMOUNT (MIN 1.00)" class="w-full bg-black/40 p-5 rounded-xl border border-white/5 outline-none focus:border-blue-500 font-black text-xs">
-                    <button id="withdraw-btn" onclick="submitWithdraw()" class="w-full bg-green-600 p-5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-green-900/20">Process Withdrawal</button>
+                    <input type="text" id="w-name" placeholder="FULL NAME" class="w-full bg-black/40 p-5 rounded-xl border border-white/5 outline-none focus:border-blue-500 font-black text-xs uppercase text-white">
+                    <input type="text" id="w-num" placeholder="GCASH NUMBER" class="w-full bg-black/40 p-5 rounded-xl border border-white/5 outline-none focus:border-blue-500 font-black text-xs text-white">
+                    <input type="number" id="w-amt" placeholder="AMOUNT (MIN 1.00)" class="w-full bg-black/40 p-5 rounded-xl border border-white/5 outline-none focus:border-blue-500 font-black text-xs text-white">
+                    <button id="withdraw-btn" onclick="submitWithdraw()" class="w-full bg-green-600 p-5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-green-900/20 text-white">Process Withdrawal</button>
                 </div>
             </div>
         </div>
@@ -124,20 +122,21 @@
                 <h2 class="text-xl font-black italic uppercase tracking-tighter ml-2">Earn Referrals</h2>
                 <div class="grid grid-cols-2 gap-3">
                     <div class="glass p-5 rounded-2xl">
-                        <p class="text-[8px] text-slate-500 font-black uppercase mb-1">Total Referrals</p>
+                        <p class="text-[8px] text-slate-500 font-black uppercase mb-1">Your Referrals</p>
                         <h4 id="stat-total-invites" class="text-2xl font-black">0</h4>
                     </div>
                     <div class="glass p-5 rounded-2xl">
-                        <p class="text-[8px] text-slate-500 font-black uppercase mb-1">Invite Bonus</p>
+                        <p class="text-[8px] text-slate-500 font-black uppercase mb-1">10% Commissions</p>
                         <h4 id="stat-invite-earnings" class="text-2xl font-black text-green-400">₱0.00</h4>
                     </div>
                 </div>
-                <div class="glass p-6 rounded-2xl space-y-3">
+                <div class="glass p-6 rounded-2xl space-y-3 text-center">
                     <p class="text-[9px] text-blue-400 font-black uppercase tracking-widest">Your Unique Link</p>
                     <div class="bg-black/40 p-4 rounded-xl border border-white/5">
-                        <p id="ref-link" class="text-[10px] font-bold text-slate-400 truncate">Fetching Link...</p>
+                        <p id="ref-link" class="text-[10px] font-bold text-slate-400 truncate">Fetching...</p>
                     </div>
-                    <button id="copy-btn" onclick="copyInvite()" class="w-full bg-blue-600 p-4 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-3"><i data-lucide="copy" class="w-4 h-4"></i> Copy Long Message</button>
+                    <button id="copy-btn" onclick="copyInvite()" class="w-full bg-blue-600 p-4 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-3"><i data-lucide="copy" class="w-4 h-4"></i> Copy Invite Message</button>
+                    <p class="text-[8px] text-slate-500 font-bold italic uppercase">Earn 10% of every game your friend wins!</p>
                 </div>
             </div>
         </div>
@@ -177,19 +176,9 @@
         const loader = document.getElementById('global-loader');
         const loaderText = document.getElementById('loader-text');
 
-        // --- LOADING CONTROLLER ---
-        function showLoader(text) {
-            loaderText.innerText = text;
-            loader.style.display = 'flex';
-            loader.style.opacity = '1';
-        }
+        function showLoader(text) { loaderText.innerText = text; loader.style.display = 'flex'; loader.style.opacity = '1'; }
+        function hideLoader() { loader.style.opacity = '0'; setTimeout(() => { loader.style.display = 'none'; }, 500); }
 
-        function hideLoader() {
-            loader.style.opacity = '0';
-            setTimeout(() => { loader.style.display = 'none'; }, 500);
-        }
-
-        // --- DEVICE FINGERPRINT ---
         function getDeviceID() {
             const data = [navigator.userAgent, screen.width, screen.height].join('×');
             let hash = 0;
@@ -201,18 +190,15 @@
         let userData = null;
         let supportURL = "https://facebook.com";
 
-        // --- APP INITIALIZATION ---
         function startApp() {
             showLoader("Authenticating...");
             const userRef = database.ref('pe_core/users/' + deviceID);
             
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
-                
                 if (data) {
                     userData = data;
                 } else {
-                    // NEW USER CREATION
                     userData = {
                         uid: Math.floor(100000 + Math.random() * 900000),
                         balance: 0.00,
@@ -223,21 +209,30 @@
                         referredBy: null
                     };
 
-                    // REFERRAL DETECTION LOGIC
                     const urlParams = new URLSearchParams(window.location.search);
                     const refCode = urlParams.get('ref');
                     if (refCode && refCode !== ("PE" + userData.uid)) {
                         userData.referredBy = refCode;
+                        incrementInviterCount(refCode);
                     }
-
                     userRef.set(userData);
                 }
                 updateUI();
                 hideLoader();
             });
 
-            database.ref('pe_core/fb').on('value', (snap) => {
-                supportURL = snap.val() || "https://facebook.com";
+            database.ref('pe_core/fb').on('value', (snap) => { supportURL = snap.val() || "https://facebook.com"; });
+        }
+
+        function incrementInviterCount(refID) {
+            database.ref('pe_core/users').once('value', (snap) => {
+                const users = snap.val();
+                for (let did in users) {
+                    if ("PE" + users[did].uid === refID) {
+                        database.ref(`pe_core/users/${did}/totalInvites`).set((users[did].totalInvites || 0) + 1);
+                        break;
+                    }
+                }
             });
         }
 
@@ -254,7 +249,6 @@
             renderHistory();
         }
 
-        // --- NAVIGATION ---
         function navigate(id) {
             showLoader("Connecting...");
             setTimeout(() => {
@@ -266,7 +260,6 @@
             }, 400);
         }
 
-        // --- GAME SYSTEM ---
         const fruits = ['🍎','🍌','🍇','🍓','🍍','🥝','🍉','🍒'];
         let flipped = [];
         let matches = 0;
@@ -295,6 +288,11 @@
                             if (matches === 16) {
                                 userData.balance += 0.05;
                                 database.ref('pe_core/users/' + deviceID).set(userData);
+
+                                if (userData.referredBy) {
+                                    payCommission(userData.referredBy, 0.005);
+                                }
+
                                 alert("Round Won! +₱0.05");
                                 navigate('page-home');
                             }
@@ -307,7 +305,23 @@
             }
         }
 
-        // --- WITHDRAWAL SYSTEM ---
+        function payCommission(refID, amount) {
+            database.ref('pe_core/users').once('value', (snap) => {
+                const users = snap.val();
+                for (let did in users) {
+                    if ("PE" + users[did].uid === refID) {
+                        const newBal = (users[did].balance || 0) + amount;
+                        const newEarn = (users[did].inviteEarnings || 0) + amount;
+                        database.ref(`pe_core/users/${did}`).update({
+                            balance: newBal,
+                            inviteEarnings: newEarn
+                        });
+                        break;
+                    }
+                }
+            });
+        }
+
         function submitWithdraw() {
             const name = document.getElementById('w-name').value;
             const num = document.getElementById('w-num').value;
@@ -342,10 +356,9 @@
             `).join('');
         }
 
-        // --- INVITE SYSTEM ---
         function copyInvite() {
             const inviteLink = `https://playearngame.netlify.app/?ref=PE${userData.uid}`;
-            const longMessage = `🚀 *Earn Real GCash with PlayEarn!* 🎮💰\n\nHey! I'm earning real cash just by matching fruits on PlayEarn! 🍎🍌\n\n✅ *Benefits:*\n• 100% Free to Play\n• Instant GCash Payouts\n• Fun & Addictive Games\n\nStart earning now with my link:\n👉 ${inviteLink}\n\nLet's win together! 🔥💸`;
+            const longMessage = `🚀 *Earn Real GCash with PlayEarn!* 🎮\n\nHey! I'm earning real cash just by matching fruits! 🍎🍌\n\n✅ *Benefits:*\n• 100% Free to Play\n• Instant GCash Payouts\n• Fun & Addictive Games\n\nStart earning now:\n👉 ${inviteLink}\n\nLet's win together! 🔥💸`;
             
             navigator.clipboard.writeText(longMessage).then(() => {
                 const btn = document.getElementById('copy-btn');
@@ -353,7 +366,7 @@
                 btn.classList.replace('bg-blue-600', 'bg-green-600');
                 lucide.createIcons();
                 setTimeout(() => {
-                    btn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i> Copy Long Message`;
+                    btn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i> Copy Invite Message`;
                     btn.classList.replace('bg-green-600', 'bg-blue-600');
                     lucide.createIcons();
                 }, 2500);
