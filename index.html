@@ -20,7 +20,6 @@
             display: flex; align-items: center; justify-content: center; flex-direction: column; 
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .loader-content { transform: scale(1); transition: all 0.5s ease; }
         .spinner { 
             width: 50px; height: 50px; border: 3px solid rgba(59, 130, 246, 0.1); 
             border-top-color: #3b82f6; border-left-color: #3b82f6; border-radius: 50%; 
@@ -178,7 +177,7 @@
         const loader = document.getElementById('global-loader');
         const loaderText = document.getElementById('loader-text');
 
-        // --- LOADING SYSTEM CONTROLLER ---
+        // --- LOADING CONTROLLER ---
         function showLoader(text) {
             loaderText.innerText = text;
             loader.style.display = 'flex';
@@ -204,25 +203,33 @@
 
         // --- APP INITIALIZATION ---
         function startApp() {
-            showLoader("Authenticating Device...");
+            showLoader("Authenticating...");
             const userRef = database.ref('pe_core/users/' + deviceID);
             
-            // Handshake stage
-            setTimeout(() => loaderText.innerText = "Syncing Wallet...", 1000);
-
             userRef.on('value', (snapshot) => {
                 const data = snapshot.val();
+                
                 if (data) {
                     userData = data;
                 } else {
+                    // NEW USER CREATION
                     userData = {
                         uid: Math.floor(100000 + Math.random() * 900000),
                         balance: 0.00,
                         totalInvites: 0,
                         inviteEarnings: 0.00,
                         history: [],
-                        did: deviceID
+                        did: deviceID,
+                        referredBy: null
                     };
+
+                    // REFERRAL DETECTION LOGIC
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const refCode = urlParams.get('ref');
+                    if (refCode && refCode !== ("PE" + userData.uid)) {
+                        userData.referredBy = refCode;
+                    }
+
                     userRef.set(userData);
                 }
                 updateUI();
@@ -238,7 +245,7 @@
             if (!userData) return;
             document.getElementById('display-uid').innerText = '#' + userData.uid;
             document.getElementById('balance').innerText = (userData.balance || 0).toFixed(2);
-            document.getElementById('ref-link').innerText = `https://playearn.pro/join?ref=PE${userData.uid}`;
+            document.getElementById('ref-link').innerText = `https://playearngame.netlify.app/?ref=PE${userData.uid}`;
             
             if(document.getElementById('stat-total-invites')) {
                 document.getElementById('stat-total-invites').innerText = userData.totalInvites || 0;
@@ -247,28 +254,27 @@
             renderHistory();
         }
 
-        // --- NAVIGATION WITH TRANSITION LOADING ---
+        // --- NAVIGATION ---
         function navigate(id) {
-            showLoader("Navigating...");
+            showLoader("Connecting...");
             setTimeout(() => {
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 document.getElementById(id).classList.add('active');
                 if(id === 'page-game') initGame();
                 lucide.createIcons();
                 hideLoader();
-            }, 300);
+            }, 400);
         }
 
-        // ... [Rest of the functions: initGame, flip, submitWithdraw, renderHistory, copyInvite, openSupport remain same] ...
+        // --- GAME SYSTEM ---
         const fruits = ['🍎','🍌','🍇','🍓','🍍','🥝','🍉','🍒'];
-        let cards = [];
         let flipped = [];
         let matches = 0;
 
         function initGame() {
             const grid = document.getElementById('game-grid');
             grid.innerHTML = '';
-            cards = [...fruits, ...fruits].sort(() => Math.random() - 0.5);
+            const cards = [...fruits, ...fruits].sort(() => Math.random() - 0.5);
             matches = 0;
             cards.forEach((f) => {
                 const div = document.createElement('div');
@@ -289,7 +295,7 @@
                             if (matches === 16) {
                                 userData.balance += 0.05;
                                 database.ref('pe_core/users/' + deviceID).set(userData);
-                                alert("Round Complete! +₱0.05");
+                                alert("Round Won! +₱0.05");
                                 navigate('page-home');
                             }
                         } else {
@@ -301,19 +307,20 @@
             }
         }
 
+        // --- WITHDRAWAL SYSTEM ---
         function submitWithdraw() {
             const name = document.getElementById('w-name').value;
             const num = document.getElementById('w-num').value;
             const amt = parseFloat(document.getElementById('w-amt').value);
-            const btn = document.getElementById('withdraw-btn');
-            if(!name || !num || isNaN(amt) || amt < 1) return alert("Please fill all fields.");
+            if(!name || !num || isNaN(amt) || amt < 1) return alert("Fill all fields correctly.");
             if(amt > userData.balance) return alert("Insufficient balance.");
-            showLoader("Processing Withdrawal...");
+            
+            showLoader("Processing...");
             userData.balance -= amt;
             if(!userData.history) userData.history = [];
             userData.history.unshift({id: Date.now(), amount: amt, number: num, name: name, status: 'PENDING', date: new Date().toLocaleDateString()});
             database.ref('pe_core/users/' + deviceID).set(userData).then(() => {
-                alert("Withdrawal Request Sent!");
+                alert("Request Sent Successfully!");
                 navigate('page-home');
             });
         }
@@ -335,9 +342,11 @@
             `).join('');
         }
 
+        // --- INVITE SYSTEM ---
         function copyInvite() {
-            const inviteLink = `https://playearn.pro/join?ref=PE${userData.uid}`;
+            const inviteLink = `https://playearngame.netlify.app/?ref=PE${userData.uid}`;
             const longMessage = `🚀 *Earn Real GCash with PlayEarn!* 🎮💰\n\nHey! I'm earning real cash just by matching fruits on PlayEarn! 🍎🍌\n\n✅ *Benefits:*\n• 100% Free to Play\n• Instant GCash Payouts\n• Fun & Addictive Games\n\nStart earning now with my link:\n👉 ${inviteLink}\n\nLet's win together! 🔥💸`;
+            
             navigator.clipboard.writeText(longMessage).then(() => {
                 const btn = document.getElementById('copy-btn');
                 btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Message Copied!`;
