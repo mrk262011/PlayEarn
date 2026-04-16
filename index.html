@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayEarn | Official App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: white; overflow: hidden; }
+        
+        /* ENHANCED LOADING SYSTEM */
+        #global-loader { 
+            position: fixed; inset: 0; z-index: 1000; background: #020617; 
+            display: flex; align-items: center; justify-content: center; flex-direction: column; 
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .loader-content { transform: scale(1); transition: all 0.5s ease; }
+        .spinner { 
+            width: 50px; height: 50px; border: 3px solid rgba(59, 130, 246, 0.1); 
+            border-top-color: #3b82f6; border-left-color: #3b82f6; border-radius: 50%; 
+            animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite; 
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Page Animations */
+        .page { display: none; height: 100vh; overflow-y: auto; padding-bottom: 100px; }
+        .page.active { display: block; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        
+        /* Memory Game Cards */
+        .card { perspective: 1000px; height: 85px; }
+        .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.5s; transform-style: preserve-3d; cursor: pointer; }
+        .card.flipped .card-inner { transform: rotateY(180deg); }
+        .card-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; border: 2px solid #3b82f6; }
+        .card-front { background: #0f172a; color: #3b82f6; }
+        .card-back { background: #fff; transform: rotateY(180deg); color: black; }
+
+        button:active { transform: scale(0.95); }
+    </style>
+</head>
+<body>
+
+    <div id="global-loader">
+        <div class="loader-content flex flex-col items-center">
+            <div class="spinner mb-6"></div>
+            <div class="text-center">
+                <h2 class="text-[11px] font-black tracking-[0.5em] text-blue-500 uppercase">Secure Link</h2>
+                <p id="loader-text" class="text-[9px] font-bold text-slate-500 uppercase mt-2">Initializing Terminal...</p>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-md mx-auto relative h-screen">
+        
+        <header class="p-6 flex justify-between items-center sticky top-0 z-50 bg-[#020617]/90 backdrop-blur-xl border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-900/20">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <p class="text-[9px] text-slate-500 font-black uppercase tracking-tighter">Terminal ID</p>
+                    <h3 id="display-uid" class="text-xs font-black text-blue-400">#------</h3>
+                </div>
+            </div>
+            <div class="glass px-4 py-2.5 rounded-xl text-right">
+                <p class="text-[9px] text-slate-400 font-black uppercase mb-0.5">Wallet</p>
+                <h2 class="text-lg font-black text-green-400">₱ <span id="balance">0.00</span></h2>
+            </div>
+        </header>
+
+        <div id="page-home" class="page active px-6 pt-4 space-y-4">
+            <div onclick="navigate('page-game')" class="bg-blue-600 p-8 rounded-[2rem] shadow-2xl active:scale-95 transition-all relative overflow-hidden group">
+                <div class="relative z-10">
+                    <p class="text-blue-100 text-[10px] font-black uppercase mb-1 tracking-widest">Active Reward</p>
+                    <h2 class="text-3xl font-black italic tracking-tighter uppercase leading-none">Fruit Master</h2>
+                    <button class="mt-4 bg-white/20 px-4 py-1.5 rounded-lg text-[9px] font-black uppercase backdrop-blur-md">Play & Earn ₱0.05</button>
+                </div>
+                <i data-lucide="gamepad-2" class="absolute right-[-15px] bottom-[-15px] w-32 h-32 text-white/10 fill-current -rotate-12"></i>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div onclick="navigate('page-withdraw')" class="glass p-5 rounded-[1.8rem] flex flex-col items-center gap-2">
+                    <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center mb-1"><i data-lucide="banknote" class="w-5 h-5 text-green-500"></i></div>
+                    <span class="font-black text-[9px] uppercase tracking-widest">Withdraw</span>
+                </div>
+                <div onclick="navigate('page-invite')" class="glass p-5 rounded-[1.8rem] flex flex-col items-center gap-2">
+                    <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mb-1"><i data-lucide="share-2" class="w-5 h-5 text-blue-500"></i></div>
+                    <span class="font-black text-[9px] uppercase tracking-widest">Invite</span>
+                </div>
+                <div onclick="navigate('page-history')" class="glass p-5 rounded-[1.8rem] flex flex-col items-center gap-2">
+                    <div class="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center mb-1"><i data-lucide="clock-3" class="w-5 h-5 text-amber-500"></i></div>
+                    <span class="font-black text-[9px] uppercase tracking-widest">History</span>
+                </div>
+                <div onclick="openSupport()" class="glass p-5 rounded-[1.8rem] flex flex-col items-center gap-2">
+                    <div class="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center mb-1"><i data-lucide="message-square" class="w-5 h-5 text-indigo-500"></i></div>
+                    <span class="font-black text-[9px] uppercase tracking-widest">Support</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-withdraw" class="page px-6 pt-4 space-y-6">
+            <button onclick="navigate('page-home')" class="text-slate-500 font-black flex items-center gap-2 text-[10px] uppercase"><i data-lucide="chevron-left" class="w-3"></i> Dashboard</button>
+            <div class="glass p-7 rounded-[2rem] space-y-5">
+                <h2 class="text-xl font-black italic uppercase tracking-tighter">GCash Payout</h2>
+                <div class="space-y-3">
+                    <input type="text" id="w-name" placeholder="FULL NAME" class="w-full bg-black/40 p-5 rounded-xl border border-white/5 outline-none focus:border-blue-500 font-black text-xs uppercase">
+                    <input type="text" id="w-num" placeholder="GCASH NUMBER" class="w-full bg-black/40 p-5 rounded-xl border border-white/5 outline-none focus:border-blue-500 font-black text-xs">
+                    <input type="number" id="w-amt" placeholder="AMOUNT (MIN 1.00)" class="w-full bg-black/40 p-5 rounded-xl border border-white/5 outline-none focus:border-blue-500 font-black text-xs">
+                    <button id="withdraw-btn" onclick="submitWithdraw()" class="w-full bg-green-600 p-5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-green-900/20">Process Withdrawal</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-invite" class="page px-6 pt-4 space-y-6">
+            <button onclick="navigate('page-home')" class="text-slate-500 font-black flex items-center gap-2 text-[10px] uppercase"><i data-lucide="chevron-left" class="w-3"></i> Dashboard</button>
+            <div class="space-y-4">
+                <h2 class="text-xl font-black italic uppercase tracking-tighter ml-2">Earn Referrals</h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="glass p-5 rounded-2xl">
+                        <p class="text-[8px] text-slate-500 font-black uppercase mb-1">Total Referrals</p>
+                        <h4 id="stat-total-invites" class="text-2xl font-black">0</h4>
+                    </div>
+                    <div class="glass p-5 rounded-2xl">
+                        <p class="text-[8px] text-slate-500 font-black uppercase mb-1">Invite Bonus</p>
+                        <h4 id="stat-invite-earnings" class="text-2xl font-black text-green-400">₱0.00</h4>
+                    </div>
+                </div>
+                <div class="glass p-6 rounded-2xl space-y-3">
+                    <p class="text-[9px] text-blue-400 font-black uppercase tracking-widest">Your Unique Link</p>
+                    <div class="bg-black/40 p-4 rounded-xl border border-white/5">
+                        <p id="ref-link" class="text-[10px] font-bold text-slate-400 truncate">Fetching Link...</p>
+                    </div>
+                    <button id="copy-btn" onclick="copyInvite()" class="w-full bg-blue-600 p-4 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-3"><i data-lucide="copy" class="w-4 h-4"></i> Copy Long Message</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-history" class="page px-6 pt-4 space-y-6">
+            <button onclick="navigate('page-home')" class="text-slate-500 font-black flex items-center gap-2 text-[10px] uppercase"><i data-lucide="chevron-left" class="w-3"></i> Dashboard</button>
+            <h2 class="text-xl font-black italic uppercase tracking-tighter">Activity Log</h2>
+            <div id="history-container" class="space-y-3"></div>
+        </div>
+
+        <div id="page-game" class="page px-6 pt-4 space-y-6">
+            <div class="flex items-center justify-between">
+                <button onclick="navigate('page-home')" class="p-3 glass rounded-full"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                <h2 class="font-black italic uppercase text-sm tracking-[0.2em]">Game Terminal</h2>
+                <div class="w-10"></div>
+            </div>
+            <div id="game-grid" class="grid grid-cols-4 gap-2.5"></div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQM1ci3OmV1MARC2uhLPRoB0QKtiNvkJk",
+            authDomain: "adsearnloo.firebaseapp.com",
+            databaseURL: "https://adsearnloo-default-rtdb.firebaseio.com",
+            projectId: "adsearnloo",
+            storageBucket: "adsearnloo.firebasestorage.app",
+            messagingSenderId: "873489937098",
+            appId: "1:873489937098:web:d950731008ec386e69fa33",
+            measurementId: "G-K8QC5J6JGC"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const loader = document.getElementById('global-loader');
+        const loaderText = document.getElementById('loader-text');
+
+        // --- LOADING SYSTEM CONTROLLER ---
+        function showLoader(text) {
+            loaderText.innerText = text;
+            loader.style.display = 'flex';
+            loader.style.opacity = '1';
+        }
+
+        function hideLoader() {
+            loader.style.opacity = '0';
+            setTimeout(() => { loader.style.display = 'none'; }, 500);
+        }
+
+        // --- DEVICE FINGERPRINT ---
+        function getDeviceID() {
+            const data = [navigator.userAgent, screen.width, screen.height].join('×');
+            let hash = 0;
+            for (let i = 0; i < data.length; i++) { hash = ((hash << 5) - hash) + data.charCodeAt(i); hash |= 0; }
+            return "PE-" + Math.abs(hash).toString(16).toUpperCase();
+        }
+
+        const deviceID = getDeviceID();
+        let userData = null;
+        let supportURL = "https://facebook.com";
+
+        // --- APP INITIALIZATION ---
+        function startApp() {
+            showLoader("Authenticating Device...");
+            const userRef = database.ref('pe_core/users/' + deviceID);
+            
+            // Handshake stage
+            setTimeout(() => loaderText.innerText = "Syncing Wallet...", 1000);
+
+            userRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    userData = data;
+                } else {
+                    userData = {
+                        uid: Math.floor(100000 + Math.random() * 900000),
+                        balance: 0.00,
+                        totalInvites: 0,
+                        inviteEarnings: 0.00,
+                        history: [],
+                        did: deviceID
+                    };
+                    userRef.set(userData);
+                }
+                updateUI();
+                hideLoader();
+            });
+
+            database.ref('pe_core/fb').on('value', (snap) => {
+                supportURL = snap.val() || "https://facebook.com";
+            });
+        }
+
+        function updateUI() {
+            if (!userData) return;
+            document.getElementById('display-uid').innerText = '#' + userData.uid;
+            document.getElementById('balance').innerText = (userData.balance || 0).toFixed(2);
+            document.getElementById('ref-link').innerText = `https://playearn.pro/join?ref=PE${userData.uid}`;
+            
+            if(document.getElementById('stat-total-invites')) {
+                document.getElementById('stat-total-invites').innerText = userData.totalInvites || 0;
+                document.getElementById('stat-invite-earnings').innerText = '₱' + (userData.inviteEarnings || 0).toFixed(2);
+            }
+            renderHistory();
+        }
+
+        // --- NAVIGATION WITH TRANSITION LOADING ---
+        function navigate(id) {
+            showLoader("Navigating...");
+            setTimeout(() => {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+                if(id === 'page-game') initGame();
+                lucide.createIcons();
+                hideLoader();
+            }, 300);
+        }
+
+        // ... [Rest of the functions: initGame, flip, submitWithdraw, renderHistory, copyInvite, openSupport remain same] ...
+        const fruits = ['🍎','🍌','🍇','🍓','🍍','🥝','🍉','🍒'];
+        let cards = [];
+        let flipped = [];
+        let matches = 0;
+
+        function initGame() {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+            cards = [...fruits, ...fruits].sort(() => Math.random() - 0.5);
+            matches = 0;
+            cards.forEach((f) => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `<div class="card-inner" onclick="flip(this, '${f}')"><div class="card-face card-front">?</div><div class="card-face card-back">${f}</div></div>`;
+                grid.appendChild(div);
+            });
+        }
+
+        function flip(el, val) {
+            if (flipped.length < 2 && !el.parentElement.classList.contains('flipped')) {
+                el.parentElement.classList.add('flipped');
+                flipped.push({el, val});
+                if (flipped.length === 2) {
+                    setTimeout(() => {
+                        if (flipped[0].val === flipped[1].val) {
+                            matches += 2;
+                            if (matches === 16) {
+                                userData.balance += 0.05;
+                                database.ref('pe_core/users/' + deviceID).set(userData);
+                                alert("Round Complete! +₱0.05");
+                                navigate('page-home');
+                            }
+                        } else {
+                            flipped.forEach(c => c.el.parentElement.classList.remove('flipped'));
+                        }
+                        flipped = [];
+                    }, 500);
+                }
+            }
+        }
+
+        function submitWithdraw() {
+            const name = document.getElementById('w-name').value;
+            const num = document.getElementById('w-num').value;
+            const amt = parseFloat(document.getElementById('w-amt').value);
+            const btn = document.getElementById('withdraw-btn');
+            if(!name || !num || isNaN(amt) || amt < 1) return alert("Please fill all fields.");
+            if(amt > userData.balance) return alert("Insufficient balance.");
+            showLoader("Processing Withdrawal...");
+            userData.balance -= amt;
+            if(!userData.history) userData.history = [];
+            userData.history.unshift({id: Date.now(), amount: amt, number: num, name: name, status: 'PENDING', date: new Date().toLocaleDateString()});
+            database.ref('pe_core/users/' + deviceID).set(userData).then(() => {
+                alert("Withdrawal Request Sent!");
+                navigate('page-home');
+            });
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history-container');
+            if(!userData.history || userData.history.length === 0) {
+                container.innerHTML = '<p class="text-center text-slate-700 py-10 uppercase text-[9px] font-black italic">No Records Found</p>';
+                return;
+            }
+            container.innerHTML = userData.history.map(h => `
+                <div class="glass p-5 rounded-2xl flex justify-between items-center">
+                    <div>
+                        <p class="font-black text-base">₱${(h.amount || 0).toFixed(2)}</p>
+                        <p class="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">${h.date} • ${h.number}</p>
+                    </div>
+                    <span class="text-[8px] font-black p-2 rounded-lg bg-white/5 uppercase ${h.status === 'PAID' ? 'text-green-500' : 'text-amber-500'} tracking-widest">${h.status}</span>
+                </div>
+            `).join('');
+        }
+
+        function copyInvite() {
+            const inviteLink = `https://playearn.pro/join?ref=PE${userData.uid}`;
+            const longMessage = `🚀 *Earn Real GCash with PlayEarn!* 🎮💰\n\nHey! I'm earning real cash just by matching fruits on PlayEarn! 🍎🍌\n\n✅ *Benefits:*\n• 100% Free to Play\n• Instant GCash Payouts\n• Fun & Addictive Games\n\nStart earning now with my link:\n👉 ${inviteLink}\n\nLet's win together! 🔥💸`;
+            navigator.clipboard.writeText(longMessage).then(() => {
+                const btn = document.getElementById('copy-btn');
+                btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Message Copied!`;
+                btn.classList.replace('bg-blue-600', 'bg-green-600');
+                lucide.createIcons();
+                setTimeout(() => {
+                    btn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i> Copy Long Message`;
+                    btn.classList.replace('bg-green-600', 'bg-blue-600');
+                    lucide.createIcons();
+                }, 2500);
+            });
+        }
+
+        function openSupport() { window.open(supportURL, '_blank'); }
+
+        lucide.createIcons();
+        window.onload = startApp;
+    </script>
+</body>
+</html>
